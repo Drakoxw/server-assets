@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use iio\libmergepdf\Merger;
-use iio\libmergepdf\Pages;
+use Illuminate\Support\Facades\Http;
+
+// use iio\libmergepdf\Pages;
 
 class PdfController extends Controller
 {
@@ -48,6 +50,30 @@ class PdfController extends Controller
         $pdf = app('dompdf.wrapper');
         $pdf->loadHTML('<h1>Styde.net</h1>');
         return $pdf->download('mi-archivo.pdf');
+    }
+
+    public function GetPdf(Request $request)
+    {
+        $requestData    = $request->all();
+        $url = $requestData['url'];
+        $app = 'application/pdf';
+
+        if (str_contains(strtolower($url), '.jpeg')) {
+            $app = 'image/jpeg';
+        } else if (str_contains(strtolower($url), '.png')) {
+            $app = 'image/png';
+        } else if (str_contains(strtolower($url), '.jpg')) {
+            $app = 'image/jpg';
+        }
+
+        $x = Http::get($url);
+        $base = base64_encode($x);
+        $base64 = 'data:'.$app.';base64,'. $base;
+        return [
+            'status' => 'ok',
+            'url' => $url,
+            'data' => $base64
+        ];
     }
 
 

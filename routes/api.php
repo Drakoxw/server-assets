@@ -23,8 +23,9 @@ Route::group(['prefix' => '/v1'], function () {
     });
 
     Route::group(['prefix' => 'pdf'], function () {
-        Route::post('/merge', [PdfController::class, 'Merge']);
-        Route::get('/download', [PdfController::class, 'Download']);
+        Route::post('/merge',         [PdfController::class, 'Merge'   ]);
+        Route::get('/download',       [PdfController::class, 'Download']);
+        Route::post('/getBasePdf',  [PdfController::class, 'GetPdf'  ]);
     });
 
 });
