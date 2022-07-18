@@ -3,6 +3,7 @@
 ### COMANDS
     curl -s https://laravel.build/example-app | bash
     ./vendor/bin/sail php artisan make:controller ProviderInvoicesController --api
+    ./vendor/bin/sail php artisan make:controller GuidesController --model=GuidesModel
 
     ./vendor/bin/sail composer dump-autoload
     ./vendor/bin/sail php artisan optimize

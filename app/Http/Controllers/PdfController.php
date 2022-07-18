@@ -49,7 +49,40 @@ class PdfController extends Controller
     {
         $pdf = app('dompdf.wrapper');
         $pdf->loadHTML('<h1>Styde.net</h1>');
-        return $pdf->download('mi-archivo.pdf');
+        $bin = $pdf->download('mi-archivo.pdf');
+
+        return [base64_encode($bin)];
+    }
+
+    public function ConvertToPDF(Request $request)
+    {
+        $this->validate($request, [
+            'html' => 'required',
+        ]);
+        try {
+            $dataReq = $request->all();
+            $dataReq['method'] = isset($dataReq['method']) ? $dataReq['method'] : '';
+            $pdf = app('dompdf.wrapper');
+            $pdf->loadHTML($dataReq['html']);
+            $bin = $pdf->download('mi-archivo.pdf');
+
+            if ($dataReq['method'] == 'show') {
+                return response($bin)
+                    ->header('Content-type' , 'application/pdf');
+            } else {
+                return response([
+                    'status'  => 'ok',
+                    'name'    => 'mi-archivo.pdf',
+                    'message' => 'archivo creado',
+                    'base'    => 'data:application/pdf;base64,'.base64_encode($bin),
+                ], 200);
+            }
+        } catch (\Throwable $e) {
+            return response([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 400);
+        }
     }
 
     public function GetPdf(Request $request)
@@ -66,8 +99,8 @@ class PdfController extends Controller
             $app = 'image/jpg';
         }
 
-        $x = Http::get($url);
-        $base = base64_encode($x);
+        $bin = Http::get($url);
+        $base = base64_encode($bin);
         $base64 = 'data:'.$app.';base64,'. $base;
         return [
             'status' => 'ok',
